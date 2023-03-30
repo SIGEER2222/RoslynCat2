@@ -1,6 +1,5 @@
 ﻿
-var require = { paths: { vs: '_content/BlazorMonaco/lib/monaco-editor/min/vs' } };
-
+console.log(1)
 import * as module from "./model.js";
 
 let languageId = module.languageId;
@@ -12,7 +11,10 @@ let assemblies = null;
 const monacoInterop = {};
 monacoInterop.editors = {};
 
-monacoInterop.setCmd = (elementId,code) => {
+monacoInterop.setCmd = (elementId, code) => {
+    console.log("开始初始化")
+    console.log(elementId)
+    console.log(code)
     //const editor = monacoInterop.editors[elementId];
     //editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function () {
     //    console.log('Ctrl + S 保存')
@@ -27,14 +29,21 @@ monacoInterop.setCmd = (elementId,code) => {
         wrappingIndent: "indent",
         wordWrap: "wordWrapColumn",//自动换行
         "semanticHighlighting.enabled": true,//启动语义高亮
+        minimap: {
+            enabled: false // 是否启用预览图
+        }, // 预览图设置
+        automaticLayout: true, // 自动布局
+        contextmenu: true, // 启用上下文菜单
+        copyWithSyntaxHighlighting: true, // 是否应将语法突出显示复制到剪贴板中 即 当你复制到word中是否保持文字高亮颜色
     });
     monacoInterop.editors[elementId] = editor;
     console.log(elementId);
     monacoInterop.setMonarchTokensProvider();
     monacoInterop.setLanguageConfiguration();
     monacoInterop.registerCompletionItemProvider();
-    monacoInterop.setTheme();
+    //monacoInterop.setTheme();
     //monacoInterop.setTokensColor(elementId);
+    console.log("初始化成功")
 }
 
 
@@ -91,6 +100,7 @@ monacoInterop.setTheme = () => {
     monaco.editor.defineTheme("myTheme", {
         base: "vs-dark",
         inherit: true,
+        minimap: false,
         rules: [
             { token: 'keyword', foreground: 'ab1f9e', fontStyle: 'bold' },
             { token: 'string', foreground: '2f810f' },
@@ -199,3 +209,5 @@ monacoInterop.quickFix = () => {
 
 
 window.monacoInterop = monacoInterop;
+
+console.log("end")

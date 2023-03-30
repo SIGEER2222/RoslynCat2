@@ -6,9 +6,8 @@ namespace RoslynCat.Data
 {
     public static class Constants
     {
-        public static readonly string monacoContainer = "editorId";
-        public static readonly string defultCode = @"
-using System;
+        public static readonly string csharpId = "editorId";
+        public static readonly string defultCode = @"using System;
 class Program
 {
     static void Main(string[] args)

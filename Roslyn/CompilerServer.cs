@@ -70,7 +70,7 @@ namespace RoslynCat.Roslyn
         }
 
         public  string CompileAndRun(string code) {
-            string err = string.Empty;
+            string res = string.Empty;
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code);
             string assemblyName = Path.GetRandomFileName();
             MetadataReference[] references  = Constants.DefaultMetadataReferences;
@@ -84,11 +84,14 @@ namespace RoslynCat.Roslyn
             using (MemoryStream ms = new MemoryStream()) {
                 EmitResult emitresult = compilation.Emit(ms);
                 if (!emitresult.Success) {
-                    IEnumerable<Diagnostic> failures = emitresult.Diagnostics.Where(diagnostic =>
-                        diagnostic.IsWarningAsError ||
-                        diagnostic.Severity == DiagnosticSeverity.Error);
+                    IEnumerable<Diagnostic> failures = emitresult.Diagnostics
+                        .Where(diagnostic =>diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
                     foreach (Diagnostic diagnostic in failures) {
-                        err = $" {diagnostic.Id}, {diagnostic.GetMessage()}";
+                        int a,b;
+                        a = diagnostic.Location.SourceSpan.Start;
+                        b = diagnostic.Location.SourceSpan.End;
+                        res = $" {diagnostic.Id}, {diagnostic.GetMessage()}";
+                        Console.WriteLine($"{a},{b}");
                         Console.Error.WriteLine("{0}: {1}",diagnostic.Id,diagnostic.GetMessage());
                     }
                 }
@@ -96,9 +99,17 @@ namespace RoslynCat.Roslyn
                     ms.Seek(0,SeekOrigin.Begin);
                     var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromStream(ms);
                     var entryPoint = assembly.EntryPoint;
+
+                    StringWriter writer = new StringWriter();
+                    var stdout = Console.Out; // 保存标准输出流
+                    Console.SetOut(writer); // 将输出流更改为文本写入器
+
                     entryPoint?.Invoke(null,new object[] { new string[] { } });
+                    res = writer.ToString();
+                    writer.Close(); // 关闭文本写入器
+                    Console.SetOut(stdout); // 将输出流还原为标准输出流
                 }
-                return err;
+                return res;
             }
         }
 
